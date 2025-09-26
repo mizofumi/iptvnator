@@ -20,6 +20,7 @@ import {
     EPG_GET_PROGRAM,
     OPEN_MPV_PLAYER,
     OPEN_VLC_PLAYER,
+    PLAYLIST_PARSE_BY_URL,
 } from '../../../shared/ipc-commands';
 import { Playlist } from '../../../shared/playlist.interface';
 import { DataService } from '../services/data.service';
@@ -180,6 +181,36 @@ export class PlaylistEffects {
             )
         );
     });
+
+    /**
+     * After playlists are loaded, if there are none present (first run),
+     * add two default remote playlists by triggering parse-by-url flow.
+     */
+    ensureDefaultPlaylists$ = createEffect(
+        () => {
+            return this.actions$.pipe(
+                ofType(PlaylistActions.loadPlaylistsSuccess),
+                tap((action) => {
+                    const playlists = action.playlists as Playlist[];
+                    if (!playlists || playlists.length === 0) {
+                        const defaults = [
+                            'https://raw.githubusercontent.com/luongz/iptv-jp/refs/heads/main/jp.m3u',
+                            'https://raw.githubusercontent.com/BooyahDev/IPTV-List/refs/heads/main/tyd.m3u8',
+                        ];
+
+                        // Use DataService to dispatch parse-by-url so both PWA and Tauri flows are used
+                        defaults.forEach((url) =>
+                            this.dataService.sendIpcEvent(PLAYLIST_PARSE_BY_URL, {
+                                title: url.split('/').pop(),
+                                url,
+                            })
+                        );
+                    }
+                })
+            );
+        },
+        { dispatch: false }
+    );
 
     removePlaylist$ = createEffect(
         () => {

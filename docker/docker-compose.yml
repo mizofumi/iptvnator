@@ -9,6 +9,10 @@ services:
       # this one should match with the address and port in frontend CLIENT_URL env
       
   frontend: 
+    # Use local build by default so `docker-compose up` will build the frontend
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
     image: 4gray/iptvnator:latest
     ports:
       - "4333:80"
