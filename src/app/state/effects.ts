@@ -21,6 +21,7 @@ import {
     OPEN_MPV_PLAYER,
     OPEN_VLC_PLAYER,
     PLAYLIST_PARSE_BY_URL,
+    PLAYLIST_UPDATE,
 } from '../../../shared/ipc-commands';
 import { Playlist } from '../../../shared/playlist.interface';
 import { DataService } from '../services/data.service';
@@ -185,6 +186,7 @@ export class PlaylistEffects {
     /**
      * After playlists are loaded, if there are none present (first run),
      * add two default remote playlists by triggering parse-by-url flow.
+     * Also refresh all existing playlists to ensure they are up to date.
      */
     ensureDefaultPlaylists$ = createEffect(
         () => {
@@ -205,6 +207,17 @@ export class PlaylistEffects {
                                 url,
                             })
                         );
+                    } else {
+                        // Refresh all existing playlists with URLs
+                        playlists.forEach((playlist) => {
+                            if (playlist.url) {
+                                this.dataService.sendIpcEvent(PLAYLIST_UPDATE, {
+                                    id: playlist._id,
+                                    title: playlist.title,
+                                    url: playlist.url,
+                                });
+                            }
+                        });
                     }
                 })
             );
