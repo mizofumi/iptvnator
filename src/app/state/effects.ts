@@ -353,24 +353,22 @@ export class PlaylistEffects {
         { dispatch: false }
     );
 
-    removeAll$ = createEffect(
-        () => {
-            return this.actions$.pipe(
-                ofType(PlaylistActions.removeAllPlaylists),
-                switchMap(() => this.playlistsService.removeAll()),
-                tap(() => {
-                    this.snackBar.open(
-                        this.translate.instant('SETTINGS.PLAYLISTS_REMOVED'),
-                        null,
-                        {
-                            duration: 2000,
-                        }
-                    );
-                })
-            );
-        },
-        { dispatch: false }
-    );
+    removeAll$ = createEffect(() => {
+        return this.actions$.pipe(
+            ofType(PlaylistActions.removeAllPlaylists),
+            switchMap(() => this.playlistsService.removeAll()),
+            tap(() => {
+                this.snackBar.open(
+                    this.translate.instant('SETTINGS.PLAYLISTS_REMOVED'),
+                    null,
+                    {
+                        duration: 2000,
+                    }
+                );
+            }),
+            map(() => PlaylistActions.loadPlaylists())
+        );
+    });
 
     setAdjacentChannelAsActive$ = createEffect(() => {
         return this.actions$.pipe(
