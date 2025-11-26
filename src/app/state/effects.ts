@@ -196,7 +196,7 @@ export class PlaylistEffects {
                     const playlists = action.playlists as Playlist[];
                     if (!playlists || playlists.length === 0) {
                         const defaults = [
-                            'https://raw.githubusercontent.com/luongz/iptv-jp/refs/heads/main/jp.m3u',
+                            'https://gitflic.ru/project/utako/utako/blob/raw?file=jp.m3u',
                             'https://raw.githubusercontent.com/BooyahDev/IPTV-List/refs/heads/main/tyd.m3u8',
                         ];
 
